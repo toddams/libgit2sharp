@@ -151,6 +151,26 @@ namespace LibGit2Sharp
         }
 
         /// <summary>
+        /// Show changes between two in-memory buffers, without either needing to exist in the object database.
+        /// </summary>
+        /// <param name="oldContent">The content you want to compare from.</param>
+        /// <param name="oldPath">Path the old content is treated as (drives attribute lookup and the patch header).</param>
+        /// <param name="newContent">The content you want to compare to.</param>
+        /// <param name="newPath">Path the new content is treated as.</param>
+        /// <param name="compareOptions">Additional options to define comparison behavior.</param>
+        /// <returns>A <see cref="ContentChanges"/> containing the changes between the two buffers.</returns>
+        public virtual ContentChanges Compare(byte[] oldContent, string oldPath, byte[] newContent, string newPath, CompareOptions compareOptions = null)
+        {
+            Ensure.ArgumentNotNull(oldContent, "oldContent");
+            Ensure.ArgumentNotNull(newContent, "newContent");
+
+            using (GitDiffOptions options = BuildOptions(DiffModifiers.None, compareOptions: compareOptions))
+            {
+                return new ContentChanges(oldContent, oldPath, newContent, newPath, options);
+            }
+        }
+
+        /// <summary>
         /// Show changes between two <see cref="Tree"/>s.
         /// </summary>
         /// <param name="oldTree">The <see cref="Tree"/> you want to compare from.</param>

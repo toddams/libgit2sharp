@@ -693,6 +693,21 @@ namespace LibGit2Sharp.Core
             IntPtr payload);
 
         [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
+        internal static extern unsafe int git_diff_buffers(
+            byte* old_buffer,
+            UIntPtr old_len,
+            [MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = UniqueId.UniqueIdentifier, MarshalTypeRef = typeof(StrictUtf8Marshaler))] string old_as_path,
+            byte* new_buffer,
+            UIntPtr new_len,
+            [MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = UniqueId.UniqueIdentifier, MarshalTypeRef = typeof(StrictUtf8Marshaler))] string new_as_path,
+            GitDiffOptions options,
+            git_diff_file_cb fileCallback,
+            git_diff_binary_cb binaryCallback,
+            git_diff_hunk_cb hunkCallback,
+            git_diff_line_cb lineCallback,
+            IntPtr payload);
+
+        [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
         internal static extern unsafe int git_diff_foreach(
             git_diff* diff,
             git_diff_file_cb fileCallback,

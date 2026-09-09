@@ -762,6 +762,36 @@ namespace LibGit2Sharp.Core
             }
         }
 
+        public static unsafe void git_diff_buffers(
+            byte[] oldBuffer,
+            string oldPath,
+            byte[] newBuffer,
+            string newPath,
+            GitDiffOptions options,
+            NativeMethods.git_diff_file_cb fileCallback,
+            NativeMethods.git_diff_hunk_cb hunkCallback,
+            NativeMethods.git_diff_line_cb lineCallback)
+        {
+            fixed (byte* oldPtr = oldBuffer)
+            fixed (byte* newPtr = newBuffer)
+            {
+                int res = NativeMethods.git_diff_buffers(oldPtr,
+                                                         new UIntPtr((ulong)oldBuffer.Length),
+                                                         oldPath,
+                                                         newPtr,
+                                                         new UIntPtr((ulong)newBuffer.Length),
+                                                         newPath,
+                                                         options,
+                                                         fileCallback,
+                                                         null,
+                                                         hunkCallback,
+                                                         lineCallback,
+                                                         IntPtr.Zero);
+
+                Ensure.ZeroResult(res);
+            }
+        }
+
         public static unsafe void git_diff_foreach(
             git_diff* diff,
             NativeMethods.git_diff_file_cb fileCallback,
