@@ -663,20 +663,20 @@ namespace LibGit2Sharp.Core
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal unsafe delegate int git_diff_hunk_cb(
             [In] git_diff_delta* delta,
-            [In] GitDiffHunk hunk,
+            [In] GitDiffHunk* hunk,
             IntPtr payload);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal unsafe delegate int git_diff_line_cb(
             [In] git_diff_delta* delta,
-            [In] GitDiffHunk hunk,
-            [In] GitDiffLine line,
+            [In] GitDiffHunk* hunk,
+            [In] GitDiffLine* line,
             IntPtr payload);
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         internal unsafe delegate int git_diff_binary_cb(
             [In] git_diff_delta* delta,
-            [In] GitDiffBinary binary,
+            [In] GitDiffBinary* binary,
             IntPtr payload);
 
         [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]

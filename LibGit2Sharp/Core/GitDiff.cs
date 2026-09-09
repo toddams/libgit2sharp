@@ -272,21 +272,21 @@ namespace LibGit2Sharp.Core
         public git_diff_file new_file;
     }
 
+    // Diff callback payloads are blittable structs handed to managed code by pointer. A class parameter
+    // on a reverse P/Invoke arrives as null under Native AOT, so the callbacks dereferenced nothing.
     [StructLayout(LayoutKind.Sequential)]
-    internal class GitDiffHunk
+    internal unsafe struct GitDiffHunk
     {
         public int OldStart;
         public int OldLines;
         public int NewStart;
         public int NewLines;
         public UIntPtr HeaderLen;
-
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 128)]
-        public byte[] Header;
+        public fixed byte Header[128];
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal class GitDiffLine
+    internal struct GitDiffLine
     {
         public GitDiffLineOrigin lineOrigin;
         public int OldLineNo;
@@ -395,7 +395,7 @@ namespace LibGit2Sharp.Core
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal class GitDiffBinaryFile
+    internal struct GitDiffBinaryFile
     {
         public GitDiffBinaryType Type;
         public IntPtr Data;
@@ -404,7 +404,7 @@ namespace LibGit2Sharp.Core
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal class GitDiffBinary
+    internal struct GitDiffBinary
     {
         public uint ContainsData;
         public GitDiffBinaryFile OldFile;

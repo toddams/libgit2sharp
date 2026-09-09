@@ -54,9 +54,9 @@ namespace LibGit2Sharp
             changes.Add(treeEntryChanges.Path, new PatchEntryChanges(delta->flags.HasFlag(GitDiffFlags.GIT_DIFF_FLAG_BINARY), treeEntryChanges));
         }
 
-        private unsafe int PrintCallBack(git_diff_delta* delta, GitDiffHunk hunk, GitDiffLine line, IntPtr payload)
+        private unsafe int PrintCallBack(git_diff_delta* delta, GitDiffHunk* hunk, GitDiffLine* line, IntPtr payload)
         {
-            string patchPart = LaxUtf8Marshaler.FromNative(line.content, (int)line.contentLen);
+            string patchPart = LaxUtf8Marshaler.FromNative(line->content, (int)line->contentLen);
 
             // Deleted files mean no "new file" path
 
@@ -68,7 +68,7 @@ namespace LibGit2Sharp
             PatchEntryChanges currentChange = this[filePath];
             string prefix = string.Empty;
 
-            switch (line.lineOrigin)
+            switch (line->lineOrigin)
             {
                 case GitDiffLineOrigin.GIT_DIFF_LINE_CONTEXT:
                     prefix = " ";
@@ -77,14 +77,14 @@ namespace LibGit2Sharp
                 case GitDiffLineOrigin.GIT_DIFF_LINE_ADDITION:
                     linesAdded++;
                     currentChange.LinesAdded++;
-                    currentChange.AddedLines.Add(new Line(line.NewLineNo, patchPart));
+                    currentChange.AddedLines.Add(new Line(line->NewLineNo, patchPart));
                     prefix = "+";
                     break;
 
                 case GitDiffLineOrigin.GIT_DIFF_LINE_DELETION:
                     linesDeleted++;
                     currentChange.LinesDeleted++;
-                    currentChange.DeletedLines.Add(new Line(line.OldLineNo, patchPart));
+                    currentChange.DeletedLines.Add(new Line(line->OldLineNo, patchPart));
                     prefix = "-";
                     break;
             }
