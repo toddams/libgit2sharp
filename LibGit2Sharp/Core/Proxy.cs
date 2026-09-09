@@ -79,7 +79,7 @@ namespace LibGit2Sharp.Core
 
             return new RawContentStream(handle, h =>
             {
-                Ensure.ZeroResult(NativeMethods.git_blob_filtered_content(buf, h, path, check_for_binary_data));
+                Ensure.ZeroResult(NativeMethods.git_blob_filtered_content(ref buf.Native, h, path, check_for_binary_data));
                 return buf.ptr;
             },
             h => (long)buf.size,
@@ -178,7 +178,7 @@ namespace LibGit2Sharp.Core
         {
             using (var buf = new GitBuf())
             {
-                int res = NativeMethods.git_branch_remote_name(buf, repo, canonical_branch_name);
+                int res = NativeMethods.git_branch_remote_name(ref buf.Native, repo, canonical_branch_name);
 
                 if (!shouldThrowIfNotFound &&
                     (res == (int)GitErrorCode.NotFound || res == (int)GitErrorCode.Ambiguous))
@@ -195,7 +195,7 @@ namespace LibGit2Sharp.Core
         {
             using (var buf = new GitBuf())
             {
-                int res = NativeMethods.git_branch_upstream_name(buf, handle, canonicalReferenceName);
+                int res = NativeMethods.git_branch_upstream_name(ref buf.Native, handle, canonicalReferenceName);
                 if (res == (int)GitErrorCode.NotFound)
                 {
                     return null;
@@ -212,7 +212,7 @@ namespace LibGit2Sharp.Core
 
         public static void git_buf_dispose(GitBuf buf)
         {
-            NativeMethods.git_buf_dispose(buf);
+            NativeMethods.git_buf_dispose(ref buf.Native);
         }
 
         #endregion
@@ -349,7 +349,7 @@ namespace LibGit2Sharp.Core
                     int res;
                     fixed (IntPtr* objs = ptrs)
                     {
-                        res = NativeMethods.git_commit_create_buffer(buf,
+                        res = NativeMethods.git_commit_create_buffer(ref buf.Native,
                             repo,
                             authorHandle,
                             committerHandle,
@@ -427,7 +427,7 @@ namespace LibGit2Sharp.Core
             using (var signedData = new GitBuf())
             {
                 var oid = id.Oid;
-                Ensure.ZeroResult(NativeMethods.git_commit_extract_signature(signature, signedData, repo, ref oid, field));
+                Ensure.ZeroResult(NativeMethods.git_commit_extract_signature(ref signature.Native, ref signedData.Native, repo, ref oid, field));
 
                 return new SignatureInfo()
                 {
@@ -479,22 +479,22 @@ namespace LibGit2Sharp.Core
 
         public static FilePath git_config_find_global()
         {
-            return ConvertPath(NativeMethods.git_config_find_global);
+            return ConvertPath((ref GitBufNative buf) => NativeMethods.git_config_find_global(ref buf));
         }
 
         public static FilePath git_config_find_system()
         {
-            return ConvertPath(NativeMethods.git_config_find_system);
+            return ConvertPath((ref GitBufNative buf) => NativeMethods.git_config_find_system(ref buf));
         }
 
         public static FilePath git_config_find_xdg()
         {
-            return ConvertPath(NativeMethods.git_config_find_xdg);
+            return ConvertPath((ref GitBufNative buf) => NativeMethods.git_config_find_xdg(ref buf));
         }
 
         public static FilePath git_config_find_programdata()
         {
-            return ConvertPath(NativeMethods.git_config_find_programdata);
+            return ConvertPath((ref GitBufNative buf) => NativeMethods.git_config_find_programdata(ref buf));
         }
 
         public static unsafe void git_config_free(git_config* config)
@@ -714,7 +714,7 @@ namespace LibGit2Sharp.Core
                             AlwaysUseLongFormat = options.AlwaysRenderLongFormat,
                         };
 
-                        res = NativeMethods.git_describe_format(buf, describeHandle, ref formatOptions);
+                        res = NativeMethods.git_describe_format(ref buf.Native, describeHandle, ref formatOptions);
                         Ensure.ZeroResult(res);
 
                         describeHandle.Dispose();
@@ -1357,7 +1357,7 @@ namespace LibGit2Sharp.Core
 
             using (var buf = new GitBuf())
             {
-                int res = NativeMethods.git_message_prettify(buf, message, true, (sbyte)comment);
+                int res = NativeMethods.git_message_prettify(ref buf.Native, message, true, (sbyte)comment);
                 Ensure.Int32Result(res);
 
                 return LaxUtf8Marshaler.FromNative(buf.ptr) ?? string.Empty;
@@ -1394,7 +1394,7 @@ namespace LibGit2Sharp.Core
         {
             using (var buf = new GitBuf())
             {
-                int res = NativeMethods.git_note_default_ref(buf, repo);
+                int res = NativeMethods.git_note_default_ref(ref buf.Native, repo);
                 Ensure.ZeroResult(res);
 
                 return LaxUtf8Marshaler.FromNative(buf.ptr);
@@ -1508,7 +1508,7 @@ namespace LibGit2Sharp.Core
             using (var obj = new ObjectSafeWrapper(id, repo))
             using (var buf = new GitBuf())
             {
-                int res = NativeMethods.git_object_short_id(buf, obj.ObjectPtr);
+                int res = NativeMethods.git_object_short_id(ref buf.Native, obj.ObjectPtr);
                 Ensure.Int32Result(res);
 
                 return LaxUtf8Marshaler.FromNative(buf.ptr);
@@ -2074,7 +2074,7 @@ namespace LibGit2Sharp.Core
         {
             using (var buf = new GitBuf())
             {
-                int res = NativeMethods.git_refspec_transform(buf, refSpecPtr, name);
+                int res = NativeMethods.git_refspec_transform(ref buf.Native, refSpecPtr, name);
                 Ensure.ZeroResult(res);
 
                 return LaxUtf8Marshaler.FromNative(buf.ptr) ?? string.Empty;
@@ -2085,7 +2085,7 @@ namespace LibGit2Sharp.Core
         {
             using (var buf = new GitBuf())
             {
-                int res = NativeMethods.git_refspec_rtransform(buf, refSpecPtr, name);
+                int res = NativeMethods.git_refspec_rtransform(ref buf.Native, refSpecPtr, name);
                 Ensure.ZeroResult(res);
 
                 return LaxUtf8Marshaler.FromNative(buf.ptr) ?? string.Empty;
@@ -2447,7 +2447,7 @@ namespace LibGit2Sharp.Core
 
         public static FilePath git_repository_discover(FilePath start_path)
         {
-            return ConvertPath(buf => NativeMethods.git_repository_discover(buf, start_path, false, null));
+            return ConvertPath((ref GitBufNative buf) => NativeMethods.git_repository_discover(ref buf, start_path, false, null));
         }
 
         public static unsafe bool git_repository_head_detached(RepositoryHandle repo)
@@ -2526,7 +2526,7 @@ namespace LibGit2Sharp.Core
         {
             using (var buf = new GitBuf())
             {
-                int res = NativeMethods.git_repository_message(buf, repo);
+                int res = NativeMethods.git_repository_message(ref buf.Native, repo);
                 if (res == (int)GitErrorCode.NotFound)
                 {
                     return null;
@@ -2990,7 +2990,7 @@ namespace LibGit2Sharp.Core
         {
             using (var buf = new GitBuf())
             {
-                int res = NativeMethods.git_submodule_resolve_url(buf, repo, url);
+                int res = NativeMethods.git_submodule_resolve_url(ref buf.Native, repo, url);
 
                 Ensure.ZeroResult(res);
                 return LaxUtf8Marshaler.FromNative(buf.ptr);
@@ -3416,9 +3416,9 @@ namespace LibGit2Sharp.Core
             {
                 int res;
                 if (isOSXArm64)
-                    res = NativeMethods.git_libgit2_opts_osxarm64((int)LibGit2Option.GetSearchPath, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, (uint)level, buf);
+                    res = NativeMethods.git_libgit2_opts_osxarm64((int)LibGit2Option.GetSearchPath, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, (uint)level, ref buf.Native);
                 else
-                    res = NativeMethods.git_libgit2_opts((int)LibGit2Option.GetSearchPath, (uint)level, buf);
+                    res = NativeMethods.git_libgit2_opts((int)LibGit2Option.GetSearchPath, (uint)level, ref buf.Native);
                 Ensure.ZeroResult(res);
 
                 path = LaxUtf8Marshaler.FromNative(buf.ptr) ?? string.Empty;
@@ -3527,9 +3527,9 @@ namespace LibGit2Sharp.Core
             {
                 int res;
                 if (isOSXArm64)
-                    res = NativeMethods.git_libgit2_opts_osxarm64((int)LibGit2Option.GetUserAgent, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, buf);
+                    res = NativeMethods.git_libgit2_opts_osxarm64((int)LibGit2Option.GetUserAgent, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, ref buf.Native);
                 else
-                    res = NativeMethods.git_libgit2_opts((int)LibGit2Option.GetUserAgent, buf);
+                    res = NativeMethods.git_libgit2_opts((int)LibGit2Option.GetUserAgent, ref buf.Native);
                 Ensure.ZeroResult(res);
 
                 userAgent = LaxUtf8Marshaler.FromNative(buf.ptr) ?? string.Empty;
@@ -3676,7 +3676,7 @@ namespace LibGit2Sharp.Core
         {
             using (var buf = new GitBuf())
             {
-                int res = NativeMethods.git_worktree_is_locked(buf, worktree);
+                int res = NativeMethods.git_worktree_is_locked(ref buf.Native, worktree);
 
                 if (res < 0)
                 {
@@ -3830,11 +3830,13 @@ namespace LibGit2Sharp.Core
             return (res == 1);
         }
 
-        private static FilePath ConvertPath(Func<GitBuf, int> pathRetriever)
+        private delegate int PathRetriever(ref GitBufNative buf);
+
+        private static FilePath ConvertPath(PathRetriever pathRetriever)
         {
             using (var buf = new GitBuf())
             {
-                int result = pathRetriever(buf);
+                int result = pathRetriever(ref buf.Native);
 
                 if (result == (int)GitErrorCode.NotFound)
                 {
