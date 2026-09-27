@@ -88,8 +88,11 @@ namespace LibGit2Sharp.Core
 
         public static unsafe byte[] git_filter_list_apply_to_workdir_file(RepositoryHandle repo, string path)
         {
+            // Matches git diff/add -p: warn on unsafe CRLF conversions instead of throwing under core.safecrlf.
+            const uint GIT_FILTER_ALLOW_UNSAFE = 1u;
+
             IntPtr filters;
-            Ensure.ZeroResult(NativeMethods.git_filter_list_load(out filters, repo, null, path, FilterMode.Clean, 0));
+            Ensure.ZeroResult(NativeMethods.git_filter_list_load(out filters, repo, null, path, FilterMode.Clean, GIT_FILTER_ALLOW_UNSAFE));
             if (filters == IntPtr.Zero)
             {
                 return null;
