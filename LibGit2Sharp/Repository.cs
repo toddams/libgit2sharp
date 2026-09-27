@@ -1710,6 +1710,20 @@ namespace LibGit2Sharp
             return new RepositoryStatus(this, options);
         }
 
+        /// <summary>
+        /// Looks up a git attribute for a path, as .gitattributes and info/attributes set it.
+        /// </summary>
+        /// <param name="path">Path relative to the root of the working directory.</param>
+        /// <param name="name">The attribute's name, e.g. "filter".</param>
+        /// <returns>The value when the attribute is set to a string; null when it is unspecified, set or unset.</returns>
+        public string GetStringAttribute(string path, string name)
+        {
+            Ensure.ArgumentNotNullOrEmptyString(path, "path");
+            Ensure.ArgumentNotNullOrEmptyString(name, "name");
+
+            return Proxy.git_attr_get_string(Handle, path, name);
+        }
+
         internal void ReloadFromDisk()
         {
             Proxy.git_index_read(Index.Handle);

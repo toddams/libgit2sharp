@@ -64,6 +64,14 @@ namespace LibGit2Sharp
         }
 
         /// <summary>
+        /// Re-reads the index file when another process changed it since it was loaded.
+        /// </summary>
+        public virtual void Reload()
+        {
+            Proxy.git_index_read(handle);
+        }
+
+        /// <summary>
         /// Determines if the <see cref="Index"/> is free from conflicts.
         /// </summary>
         public virtual bool IsFullyMerged

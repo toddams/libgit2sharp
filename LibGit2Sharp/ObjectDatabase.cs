@@ -111,6 +111,32 @@ namespace LibGit2Sharp
         }
 
         /// <summary>
+        /// Reads a working directory file the way git would store it: through the clean filters
+        /// (core.autocrlf, the eol and text attributes, ident) that apply to its path.
+        /// </summary>
+        /// <param name="path">Path relative to the root of the working directory.</param>
+        /// <returns>The filtered content, or the file's bytes as they are when no filter applies.</returns>
+        public virtual byte[] ReadFilteredFile(string path)
+        {
+            Ensure.ArgumentNotNullOrEmptyString(path, "path");
+
+            return Proxy.git_filter_list_apply_to_workdir_file(repo.Handle, path)
+                ?? File.ReadAllBytes(Path.Combine(repo.Info.WorkingDirectory, path));
+        }
+
+        /// <summary>
+        /// Computes the id a blob with this content would have, without writing it.
+        /// </summary>
+        /// <param name="content">The blob's content.</param>
+        /// <returns>The blob's id.</returns>
+        public virtual ObjectId HashBlob(byte[] content)
+        {
+            Ensure.ArgumentNotNull(content, "content");
+
+            return Proxy.git_odb_hash(content, GitObjectType.Blob);
+        }
+
+        /// <summary>
         /// Adds the provided backend to the object database with the specified priority.
         /// <para>
         /// If the provided backend implements <see cref="IDisposable"/>, the <see cref="IDisposable.Dispose"/>

@@ -86,6 +86,61 @@ namespace LibGit2Sharp.Core
             new[] { buf });
         }
 
+        public static unsafe byte[] git_filter_list_apply_to_workdir_file(RepositoryHandle repo, string path)
+        {
+            IntPtr filters;
+            Ensure.ZeroResult(NativeMethods.git_filter_list_load(out filters, repo, null, path, FilterMode.Clean, 0));
+            if (filters == IntPtr.Zero)
+            {
+                return null;
+            }
+
+            try
+            {
+                using (var buf = new GitBuf())
+                {
+                    Ensure.ZeroResult(NativeMethods.git_filter_list_apply_to_file(ref buf.Native, filters, repo, path));
+                    var content = new byte[(long)buf.size];
+                    if (content.Length > 0)
+                    {
+                        Marshal.Copy(buf.ptr, content, 0, content.Length);
+                    }
+
+                    return content;
+                }
+            }
+            finally
+            {
+                NativeMethods.git_filter_list_free(filters);
+            }
+        }
+
+        public static unsafe string git_attr_get_string(RepositoryHandle repo, string path, string name)
+        {
+            const int GIT_ATTR_VALUE_STRING = 3;
+
+            IntPtr value;
+            Ensure.ZeroResult(NativeMethods.git_attr_get(out value, repo, 0, path, name));
+            return NativeMethods.git_attr_value(value) == GIT_ATTR_VALUE_STRING
+                ? LaxUtf8Marshaler.FromNative(value)
+                : null;
+        }
+
+        private static readonly byte[] EmptyHashInput = new byte[1];
+
+        public static unsafe ObjectId git_odb_hash(byte[] content, GitObjectType type)
+        {
+            var oid = new GitOid();
+            // fixed over an empty array yields a null pointer; hand libgit2 a real one with length 0.
+            var input = content.Length == 0 ? EmptyHashInput : content;
+            fixed (byte* data = input)
+            {
+                Ensure.ZeroResult(NativeMethods.git_odb_hash(ref oid, data, new UIntPtr((ulong)content.Length), type));
+            }
+
+            return oid;
+        }
+
         public static unsafe UnmanagedMemoryStream git_blob_rawcontent_stream(RepositoryHandle repo, ObjectId id, long size)
         {
             var handle = new ObjectSafeWrapper(id, repo, throwIfMissing: true).ObjectPtr;
