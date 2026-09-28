@@ -35,6 +35,7 @@
         public StatusOptions()
         {
             DetectRenamesInIndex = true;
+            DetectRenamesFromRewrites = true;
             IncludeIgnored = true;
             IncludeUntracked = true;
             RecurseUntrackedDirs = true;
@@ -54,6 +55,13 @@
         /// Examine unstaged changes in the working directory for renames.
         /// </summary>
         public bool DetectRenamesInWorkDir { get; set; }
+
+        /// <summary>
+        /// When detecting renames, split heavily rewritten files so their old
+        /// content can be the source of a rename, the rewritten file then being
+        /// reported as new. git status never does this.
+        /// </summary>
+        public bool DetectRenamesFromRewrites { get; set; }
 
         /// <summary>
         /// Exclude submodules from being scanned for status

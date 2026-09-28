@@ -92,16 +92,17 @@ namespace LibGit2Sharp
 
             if (options.DetectRenamesInIndex)
             {
-                coreOptions.Flags |=
-                    GitStatusOptionFlags.RenamesHeadToIndex |
-                    GitStatusOptionFlags.RenamesFromRewrites;
+                coreOptions.Flags |= GitStatusOptionFlags.RenamesHeadToIndex;
             }
 
             if (options.DetectRenamesInWorkDir)
             {
-                coreOptions.Flags |=
-                    GitStatusOptionFlags.RenamesIndexToWorkDir |
-                    GitStatusOptionFlags.RenamesFromRewrites;
+                coreOptions.Flags |= GitStatusOptionFlags.RenamesIndexToWorkDir;
+            }
+
+            if ((options.DetectRenamesInIndex || options.DetectRenamesInWorkDir) && options.DetectRenamesFromRewrites)
+            {
+                coreOptions.Flags |= GitStatusOptionFlags.RenamesFromRewrites;
             }
 
             if (options.ExcludeSubmodules)
