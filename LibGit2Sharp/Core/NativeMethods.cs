@@ -1662,6 +1662,10 @@ namespace LibGit2Sharp.Core
         internal static extern unsafe FilePath git_repository_path(git_repository* repository);
 
         [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
+        [return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalCookie = UniqueId.UniqueIdentifier, MarshalTypeRef = typeof(LaxFilePathNoCleanupMarshaler))]
+        internal static extern unsafe FilePath git_repository_commondir(git_repository* repository);
+
+        [DllImport(libgit2, CallingConvention = CallingConvention.Cdecl)]
         internal static extern unsafe int git_repository_set_config(
             git_repository* repository,
             git_config* config);

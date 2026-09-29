@@ -21,9 +21,11 @@ namespace LibGit2Sharp
             IsBare = isBare;
 
             FilePath path = Proxy.git_repository_path(repo.Handle);
+            FilePath commonPath = Proxy.git_repository_commondir(repo.Handle);
             FilePath workingDirectoryPath = Proxy.git_repository_workdir(repo.Handle);
 
             Path = path == null ? null : path.Native;
+            CommonPath = commonPath == null ? null : commonPath.Native;
             WorkingDirectory = workingDirectoryPath == null ? null : workingDirectoryPath.Native;
             IsShallow = Proxy.git_repository_is_shallow(repo.Handle);
         }
@@ -32,6 +34,14 @@ namespace LibGit2Sharp
         /// Gets the normalized path to the git repository.
         /// </summary>
         public virtual string Path { get; private set; }
+
+        /// <summary>
+        /// Gets the normalized path to the git directory shared by all worktrees of the repository.
+        /// <para>
+        ///   The same as <see cref="Path"/>, except in a linked worktree.
+        /// </para>
+        /// </summary>
+        public virtual string CommonPath { get; private set; }
 
         /// <summary>
         /// Gets the normalized path to the working directory.

@@ -2682,6 +2682,11 @@ namespace LibGit2Sharp.Core
             return NativeMethods.git_repository_path(repo);
         }
 
+        public static unsafe FilePath git_repository_commondir(RepositoryHandle repo)
+        {
+            return NativeMethods.git_repository_commondir(repo);
+        }
+
         public static unsafe int git_repository_set_config(RepositoryHandle repo, ConfigurationHandle config)
         {
             return NativeMethods.git_repository_set_config(repo, config);
