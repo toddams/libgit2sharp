@@ -124,9 +124,10 @@ namespace LibGit2Sharp
         {
             Ensure.ArgumentNotNull(stasher, "stasher");
 
-            string prettifiedMessage = Proxy.git_message_prettify(string.IsNullOrEmpty(message) ? string.Empty : message, null);
+            // As `git stash push -m`: libgit2 writes "WIP on <branch>: <commit>" only for a null message, and ends the message itself
+            string stashMessage = string.IsNullOrEmpty(message) ? null : message;
 
-            ObjectId oid = Proxy.git_stash_save(repo.Handle, stasher, prettifiedMessage, options);
+            ObjectId oid = Proxy.git_stash_save(repo.Handle, stasher, stashMessage, options);
 
             // in case there is nothing to stash
             if (oid == null)
